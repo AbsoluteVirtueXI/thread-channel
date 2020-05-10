@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 #[tokio::main]
 async fn main() -> Result<(), std::io::Error> {
-    let (mut tx, mut rx) = mpsc::channel(100); //what is this size
+    let (mut tx, mut rx) = mpsc::channel(100);
     let rx1 = Arc::new(Mutex::new(rx));
     let rx2 = Arc::clone(&rx1);
 
