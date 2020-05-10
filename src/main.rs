@@ -1,5 +1,5 @@
 use tokio::sync::{mpsc,Mutex};
-use tokio::time::{interval, Duration};
+use tokio::time::{interval, Duration, delay_for};
 use std::sync::Arc;
 
 #[tokio::main]
@@ -10,6 +10,7 @@ async fn main() -> Result<(), std::io::Error> {
 
     let mut interval = interval(Duration::from_secs(1));
 
+    // Every 1 second we send a message to the receiver half of the channel
     let ticker = tokio::spawn(async move {
         loop {
             interval.tick().await;
@@ -25,9 +26,12 @@ async fn main() -> Result<(), std::io::Error> {
         }
     });
 
+    // This taks is delayed by 2 seconds
     let ringer2 = tokio::spawn(async move {
-        while let Some(i) = rx2.lock().await.recv().await {
-            println!("Ringer 2: got = {}", i);
+        loop {
+            delay_for(Duration::from_secs(2)).await;
+            let data = rx2.lock().await.recv().await;
+            println!("Ringer 2: got = {}", data.unwrap());
         }
     });
 
